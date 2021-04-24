@@ -1,7 +1,7 @@
 use super::signed_to_unsigned;
 use bitvec::prelude::*;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct BitVecWriter {
     bs: BitVec<Msb0, u8>,
     offset: usize,
