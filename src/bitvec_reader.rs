@@ -1,3 +1,5 @@
+use anyhow::{bail, Result};
+
 use bitvec::mem::BitMemory;
 use bitvec::prelude::*;
 use std::fmt;
@@ -17,11 +19,14 @@ impl BitVecReader {
     }
 
     #[inline(always)]
-    pub fn get(&mut self) -> bool {
-        let val = self.bs.get(self.offset).unwrap();
-        self.offset += 1;
+    pub fn get(&mut self) -> Result<bool> {
+        if let Some(val) = self.bs.get(self.offset) {
+            self.offset += 1;
 
-        *val
+            Ok(*val)
+        } else {
+            bail!("get: out of bounds");
+        }
     }
 
     #[inline(always)]
@@ -34,7 +39,7 @@ impl BitVecReader {
 
     // bitstring.py implementation: https://github.com/scott-griffiths/bitstring/blob/master/bitstring.py#L1706
     #[inline(always)]
-    pub fn get_ue(&mut self) -> u64 {
+    pub fn get_ue(&mut self) -> Result<u64> {
         let oldpos = self.offset;
         let mut pos = self.offset;
 
@@ -47,7 +52,7 @@ impl BitVecReader {
                         break;
                     }
                 }
-                None => panic!("Out of bounds index: {}", pos),
+                None => bail!("get_ue: out of bounds index: {}", pos),
             }
         }
 
@@ -56,7 +61,7 @@ impl BitVecReader {
 
         if leading_zeroes > 0 {
             if pos + leading_zeroes + 1 > self.bs.len() {
-                panic!("Out of bounds attempt");
+                bail!("get_ue: out of bounds attempt");
             }
 
             code_num += self.bs[pos + 1..pos + leading_zeroes + 1].load_be::<u64>();
@@ -68,21 +73,23 @@ impl BitVecReader {
 
         self.offset = pos;
 
-        code_num
+        Ok(code_num)
     }
 
     // bitstring.py implementation: https://github.com/scott-griffiths/bitstring/blob/master/bitstring.py#L1767
     #[inline(always)]
-    pub fn get_se(&mut self) -> i64 {
-        let code_num = self.get_ue();
+    pub fn get_se(&mut self) -> Result<i64> {
+        let code_num = self.get_ue()?;
 
         let m = ((code_num + 1) as f64 / 2.0).floor() as u64;
 
-        if code_num % 2 == 0 {
+        let val = if code_num % 2 == 0 {
             -(m as i64)
         } else {
             m as i64
-        }
+        };
+
+        Ok(val)
     }
 
     pub fn is_aligned(&self) -> bool {

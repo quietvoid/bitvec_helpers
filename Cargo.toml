@@ -1,6 +1,6 @@
 [package]
 name = "bitvec_helpers"
-version = "0.1.1"
+version = "1.0.0"
 authors = ["quietvoid"]
 edition = "2018"
 license = "MIT"
@@ -9,3 +9,4 @@ repository = "https://github.com/quietvoid/bitvec_helpers"
 
 [dependencies]
 bitvec = "0.22.3"
+anyhow = "1.0.45"
