@@ -103,6 +103,10 @@ impl BitVecReader {
     pub fn skip_n(&mut self, n: usize) {
         self.offset += n;
     }
+
+    pub fn available_slice(&self) -> &BitSlice<Msb0, u8>{
+        &self.bs[self.offset..]
+    }
 }
 
 impl fmt::Debug for BitVecReader {
