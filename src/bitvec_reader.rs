@@ -1,12 +1,12 @@
 use anyhow::{bail, Result};
 
-use bitvec::mem::BitMemory;
 use bitvec::prelude::*;
+use funty::Integral;
 use std::fmt;
 
 #[derive(Default)]
 pub struct BitVecReader {
-    bs: BitVec<Msb0, u8>,
+    bs: BitVec<u8, Msb0>,
     offset: usize,
 }
 
@@ -30,8 +30,8 @@ impl BitVecReader {
     }
 
     #[inline(always)]
-    pub fn get_n<T: BitMemory>(&mut self, n: usize) -> T {
-        let val = self.bs[self.offset..self.offset + n].load_be::<T>();
+    pub fn get_n<I: Integral>(&mut self, n: usize) -> I {
+        let val = self.bs[self.offset..self.offset + n].load_be::<I>();
         self.offset += n;
 
         val
@@ -104,7 +104,7 @@ impl BitVecReader {
         self.offset += n;
     }
 
-    pub fn available_slice(&self) -> &BitSlice<Msb0, u8>{
+    pub fn available_slice(&self) -> &BitSlice<u8, Msb0> {
         &self.bs[self.offset..]
     }
 }

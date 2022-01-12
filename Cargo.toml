@@ -8,5 +8,6 @@ description = "BitVec based bitstream reader and writer"
 repository = "https://github.com/quietvoid/bitvec_helpers"
 
 [dependencies]
-bitvec = "0.22.3"
-anyhow = "1.0.45"
+bitvec = "1.0.0"
+funty = "2.0.0"
+anyhow = "1.0.52"

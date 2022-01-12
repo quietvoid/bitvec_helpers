@@ -3,7 +3,7 @@ use bitvec::prelude::*;
 
 #[derive(Debug, Default)]
 pub struct BitVecWriter {
-    bs: BitVec<Msb0, u8>,
+    bs: BitVec<u8, Msb0>,
     offset: usize,
 }
 
@@ -23,7 +23,7 @@ impl BitVecWriter {
 
     #[inline(always)]
     pub fn write_n(&mut self, v: &[u8], n: usize) {
-        let slice: &BitSlice<Msb0, u8> = v.view_bits();
+        let slice: &BitSlice<u8, Msb0> = v.view_bits();
 
         self.bs.extend_from_bitslice(&slice[slice.len() - n..]);
 
@@ -36,7 +36,7 @@ impl BitVecWriter {
             self.bs.push(true);
             self.offset += 1;
         } else {
-            let mut vec: BitVec<Msb0, u8> = BitVec::new();
+            let mut vec: BitVec<u8, Msb0> = BitVec::new();
             let mut tmp = v + 1;
             let mut leading_zeroes: i64 = -1;
 
