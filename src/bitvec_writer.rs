@@ -72,4 +72,8 @@ impl BitVecWriter {
     pub fn as_slice(&self) -> &[u8] {
         self.bs.as_raw_slice()
     }
+
+    pub fn written_bits(&self) -> usize {
+        self.offset
+    }
 }

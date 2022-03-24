@@ -107,6 +107,10 @@ impl BitVecReader {
     pub fn available_slice(&self) -> &BitSlice<u8, Msb0> {
         &self.bs[self.offset..]
     }
+
+    pub fn position(&self) -> usize {
+        self.offset
+    }
 }
 
 impl fmt::Debug for BitVecReader {
