@@ -11,4 +11,4 @@ repository = "https://github.com/quietvoid/bitvec_helpers"
 [dependencies]
 bitvec = "1.0.0"
 funty = "2.0.0"
-anyhow = "1.0.52"
+anyhow = "1.0.56"
