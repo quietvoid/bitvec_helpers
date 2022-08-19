@@ -3,12 +3,12 @@ name = "bitvec_helpers"
 version = "1.0.2"
 authors = ["quietvoid"]
 edition = "2021"
-rust-version = "1.56.0"
+rust-version = "1.56.1"
 license = "MIT"
 description = "BitVec based bitstream reader and writer"
 repository = "https://github.com/quietvoid/bitvec_helpers"
 
 [dependencies]
-bitvec = "1.0.0"
+bitvec = "1.0.1"
 funty = "2.0.0"
-anyhow = "1.0.56"
+anyhow = "1.0.62"
