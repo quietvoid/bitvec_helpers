@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::{bail, ensure, Result};
 
 use bitvec::prelude::*;
 use funty::Integral;
@@ -30,11 +30,19 @@ impl BitVecReader {
     }
 
     #[inline(always)]
-    pub fn get_n<I: Integral>(&mut self, n: usize) -> I {
+    pub fn get_n<I: Integral>(&mut self, n: usize) -> Result<I> {
+        let available = self.available();
+
+        ensure!(
+            bitvec::mem::bits_of::<I>() <= available,
+            "get_n: out of bounds load attempt"
+        );
+        ensure!(n <= available, "get_n: out of bounds bits");
+
         let val = self.bs[self.offset..self.offset + n].load_be::<I>();
         self.offset += n;
 
-        val
+        Ok(val)
     }
 
     // bitstring.py implementation: https://github.com/scott-griffiths/bitstring/blob/master/bitstring.py#L1706
@@ -92,22 +100,31 @@ impl BitVecReader {
         Ok(val)
     }
 
+    #[inline(always)]
     pub fn is_aligned(&self) -> bool {
         self.offset % 8 == 0
     }
 
+    #[inline(always)]
     pub fn available(&self) -> usize {
         self.bs.len() - self.offset
     }
 
-    pub fn skip_n(&mut self, n: usize) {
+    #[inline(always)]
+    pub fn skip_n(&mut self, n: usize) -> Result<()> {
+        if self.offset + n > self.available() {
+            bail!("Cannot skip more bits than available");
+        }
+
         self.offset += n;
+        Ok(())
     }
 
     pub fn available_slice(&self) -> &BitSlice<u8, Msb0> {
         &self.bs[self.offset..]
     }
 
+    #[inline(always)]
     pub fn position(&self) -> usize {
         self.offset
     }
@@ -122,4 +139,24 @@ impl fmt::Debug for BitVecReader {
             self.bs.len()
         )
     }
+}
+
+#[test]
+fn get_n_validations() {
+    let mut reader = BitVecReader::new(vec![1]);
+    assert!(reader.get_n::<u8>(9).is_err());
+    assert!(reader.get_n::<u16>(4).is_err());
+
+    assert!(reader.get_n::<u8>(8).is_ok());
+    assert!(reader.get().is_err());
+}
+
+#[test]
+fn skip_n_validations() {
+    let mut reader = BitVecReader::new(vec![1]);
+    assert!(reader.skip_n(9).is_err());
+
+    assert!(reader.skip_n(7).is_ok());
+    assert!(reader.get().is_ok());
+    assert!(reader.get().is_err());
 }

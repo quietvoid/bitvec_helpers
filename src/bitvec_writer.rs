@@ -65,15 +65,17 @@ impl BitVecWriter {
         self.write_ue(signed_to_unsigned(v));
     }
 
+    #[inline(always)]
     pub fn is_aligned(&self) -> bool {
         self.offset % 8 == 0
     }
 
-    pub fn as_slice(&self) -> &[u8] {
-        self.bs.as_raw_slice()
-    }
-
+    #[inline(always)]
     pub fn written_bits(&self) -> usize {
         self.offset
+    }
+
+    pub fn as_slice(&self) -> &[u8] {
+        self.bs.as_raw_slice()
     }
 }
