@@ -85,9 +85,10 @@ impl fmt::Debug for BitSliceReader<'_> {
 fn get_n_validations() {
     let mut reader = BitSliceReader::new(&[1]);
     assert!(reader.get_n::<u8>(9).is_err());
-    assert!(reader.get_n::<u16>(4).is_err());
+    assert!(reader.get_n::<u16>(4).is_ok());
 
-    assert!(reader.get_n::<u8>(8).is_ok());
+    assert!(reader.get_n::<u8>(8).is_err());
+    assert!(reader.get_n::<u8>(4).is_ok());
     assert!(reader.get().is_err());
 }
 
