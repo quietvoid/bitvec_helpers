@@ -1,43 +1,43 @@
 use anyhow::{bail, Result};
 
-use bitvec::{prelude::Msb0, slice::BitSlice, vec::BitVec};
+use bitvec::{prelude::Msb0, slice::BitSlice, view::BitView};
 use funty::Integral;
 use std::fmt;
 
 use super::reads::BitSliceReadExt;
 
 #[derive(Default)]
-pub struct BitVecReader {
-    bs: BitVec<u8, Msb0>,
+pub struct BitSliceReader<'a> {
+    bytes: &'a [u8],
     offset: usize,
 }
 
-impl BitVecReader {
-    pub fn new(data: Vec<u8>) -> Self {
-        Self {
-            bs: BitVec::from_vec(data),
-            offset: 0,
-        }
+impl<'a> BitSliceReader<'a> {
+    pub fn new(bytes: &'a [u8]) -> Self {
+        Self { bytes, offset: 0 }
+    }
+
+    fn bits(&self) -> &BitSlice<u8, Msb0> {
+        self.bytes.view_bits::<Msb0>()
     }
 
     #[inline(always)]
     pub fn get(&mut self) -> Result<bool> {
-        BitSliceReadExt::get(self.bs.as_bitslice(), &mut self.offset)
+        BitSliceReadExt::get(self.bytes.view_bits::<Msb0>(), &mut self.offset)
     }
 
     #[inline(always)]
     pub fn get_n<I: Integral>(&mut self, n: usize) -> Result<I> {
-        BitSliceReadExt::get_n(self.bs.as_bitslice(), n, &mut self.offset)
+        BitSliceReadExt::get_n(self.bytes.view_bits::<Msb0>(), n, &mut self.offset)
     }
 
-    #[inline(always)]
     pub fn get_ue(&mut self) -> Result<u64> {
-        BitSliceReadExt::get_ue(self.bs.as_bitslice(), &mut self.offset)
+        BitSliceReadExt::get_ue(self.bytes.view_bits::<Msb0>(), &mut self.offset)
     }
 
     #[inline(always)]
     pub fn get_se(&mut self) -> Result<i64> {
-        BitSliceReadExt::get_se(self.bs.as_bitslice(), &mut self.offset)
+        BitSliceReadExt::get_se(self.bytes.view_bits::<Msb0>(), &mut self.offset)
     }
 
     #[inline(always)]
@@ -47,7 +47,7 @@ impl BitVecReader {
 
     #[inline(always)]
     pub fn available(&self) -> usize {
-        self.bs.len() - self.offset
+        self.bits().len() - self.offset
     }
 
     #[inline(always)]
@@ -61,7 +61,7 @@ impl BitVecReader {
     }
 
     pub fn available_slice(&self) -> &BitSlice<u8, Msb0> {
-        &self.bs[self.offset..]
+        &self.bits()[self.offset..]
     }
 
     #[inline(always)]
@@ -70,20 +70,20 @@ impl BitVecReader {
     }
 }
 
-impl fmt::Debug for BitVecReader {
+impl fmt::Debug for BitSliceReader<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "BitVecReader: {{offset: {}, len: {}}}",
+            "BitSliceReader: {{offset: {}, len: {}}}",
             self.offset,
-            self.bs.len()
+            self.bytes.len()
         )
     }
 }
 
 #[test]
 fn get_n_validations() {
-    let mut reader = BitVecReader::new(vec![1]);
+    let mut reader = BitSliceReader::new(&[1]);
     assert!(reader.get_n::<u8>(9).is_err());
     assert!(reader.get_n::<u16>(4).is_err());
 
@@ -93,7 +93,7 @@ fn get_n_validations() {
 
 #[test]
 fn skip_n_validations() {
-    let mut reader = BitVecReader::new(vec![1]);
+    let mut reader = BitSliceReader::new(&[1]);
     assert!(reader.skip_n(9).is_err());
 
     assert!(reader.skip_n(7).is_ok());

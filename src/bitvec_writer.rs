@@ -1,5 +1,5 @@
 use super::signed_to_unsigned;
-use bitvec::prelude::*;
+use bitvec::{prelude::Msb0, slice::BitSlice, vec::BitVec, view::BitView};
 
 #[derive(Debug, Default)]
 pub struct BitVecWriter {
