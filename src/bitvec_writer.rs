@@ -15,6 +15,13 @@ impl BitVecWriter {
         }
     }
 
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self {
+            bs: BitVec::with_capacity(capacity),
+            offset: 0,
+        }
+    }
+
     #[inline(always)]
     pub fn write(&mut self, v: bool) {
         self.bs.push(v);
@@ -36,7 +43,6 @@ impl BitVecWriter {
             self.bs.push(true);
             self.offset += 1;
         } else {
-            let mut vec: BitVec<u8, Msb0> = BitVec::new();
             let mut tmp = v + 1;
             let mut leading_zeroes: i64 = -1;
 
@@ -47,16 +53,15 @@ impl BitVecWriter {
 
             let remaining = (v + 1 - (1 << leading_zeroes)).to_be_bytes();
 
-            for _ in 0..leading_zeroes {
-                vec.push(false);
-            }
+            let leading_zeroes = leading_zeroes as usize;
+            let bits_iter = std::iter::repeat(false)
+                .take(leading_zeroes)
+                .chain(std::iter::once(true));
 
-            vec.push(true);
+            self.bs.extend(bits_iter);
+            self.offset += leading_zeroes + 1;
 
-            self.bs.extend_from_bitslice(&vec);
-            self.offset += vec.len();
-
-            self.write_n(&remaining, leading_zeroes as usize);
+            self.write_n(&remaining, leading_zeroes);
         }
     }
 
