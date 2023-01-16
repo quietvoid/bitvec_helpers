@@ -31,6 +31,7 @@ impl<'a> BitSliceReader<'a> {
         BitSliceReadExt::get_n(self.bytes.view_bits::<Msb0>(), n, &mut self.offset)
     }
 
+    #[inline(always)]
     pub fn get_ue(&mut self) -> Result<u64> {
         BitSliceReadExt::get_ue(self.bytes.view_bits::<Msb0>(), &mut self.offset)
     }

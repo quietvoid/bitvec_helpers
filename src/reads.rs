@@ -55,21 +55,21 @@ impl BitSliceReadExt {
         }
 
         let leading_zeroes = pos - oldpos;
-        let mut code_num = (1 << leading_zeroes) - 1;
+        let endpos = pos + leading_zeroes + 1;
 
-        if leading_zeroes > 0 {
-            if pos + leading_zeroes + 1 > slice.len() {
+        let code_num = if leading_zeroes > 0 {
+            if endpos > slice.len() {
                 bail!("get_ue: out of bounds attempt");
             }
 
-            code_num += slice[pos + 1..pos + leading_zeroes + 1].load_be::<u64>();
-            pos += leading_zeroes + 1;
-        } else {
-            assert_eq!(code_num, 0);
-            pos += 1;
-        }
+            let code_num = (1 << leading_zeroes) - 1;
 
-        *offset = pos;
+            code_num + slice[pos + 1..endpos].load_be::<u64>()
+        } else {
+            0
+        };
+
+        *offset = endpos;
 
         Ok(code_num)
     }

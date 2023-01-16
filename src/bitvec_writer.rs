@@ -1,5 +1,7 @@
-use super::signed_to_unsigned;
-use bitvec::{prelude::Msb0, slice::BitSlice, vec::BitVec, view::BitView};
+use bitvec::{prelude::Msb0, vec::BitVec, view::BitView};
+use funty::Integral;
+
+use crate::signed_to_unsigned;
 
 #[derive(Debug, Default)]
 pub struct BitVecWriter {
@@ -29,17 +31,32 @@ impl BitVecWriter {
     }
 
     #[inline(always)]
-    pub fn write_n(&mut self, v: &[u8], n: usize) {
-        let slice: &BitSlice<u8, Msb0> = v.view_bits();
+    pub fn write_n<T: Integral>(&mut self, v: &T, n: usize)
+    where
+        T::Bytes: BitView,
+    {
+        let bytes = v.to_be_bytes();
+        let slice = bytes.view_bits::<Msb0>();
 
-        self.bs.extend_from_bitslice(&slice[slice.len() - n..]);
+        let bits_diff = if n as u32 > T::BITS {
+            (n as u32 - T::BITS) as usize
+        } else {
+            0
+        };
+
+        if bits_diff > 0 {
+            self.bs.extend(std::iter::repeat(false).take(bits_diff));
+            self.bs.extend_from_bitslice(slice);
+        } else {
+            self.bs.extend_from_bitslice(&slice[slice.len() - n..]);
+        }
 
         self.offset += n;
     }
 
     #[inline(always)]
-    pub fn write_ue(&mut self, v: u64) {
-        if v == 0 {
+    pub fn write_ue(&mut self, v: &u64) {
+        if *v == 0 {
             self.bs.push(true);
             self.offset += 1;
         } else {
@@ -51,8 +68,6 @@ impl BitVecWriter {
                 leading_zeroes += 1;
             }
 
-            let remaining = (v + 1 - (1 << leading_zeroes)).to_be_bytes();
-
             let leading_zeroes = leading_zeroes as usize;
             let bits_iter = std::iter::repeat(false)
                 .take(leading_zeroes)
@@ -61,13 +76,14 @@ impl BitVecWriter {
             self.bs.extend(bits_iter);
             self.offset += leading_zeroes + 1;
 
+            let remaining = v + 1 - (1 << leading_zeroes);
             self.write_n(&remaining, leading_zeroes);
         }
     }
 
     #[inline(always)]
-    pub fn write_se(&mut self, v: i64) {
-        self.write_ue(signed_to_unsigned(v));
+    pub fn write_se(&mut self, v: &i64) {
+        self.write_ue(&signed_to_unsigned(v));
     }
 
     #[inline(always)]
