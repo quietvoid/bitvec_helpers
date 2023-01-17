@@ -7,6 +7,12 @@ pub struct BitstreamIoReader<R: io::Read + io::Seek> {
     len: u64,
 }
 
+/// Convenience type for Vec<u8> inner buffer
+pub type BsIoVecReader = BitstreamIoReader<io::Cursor<Vec<u8>>>;
+
+/// Convenience type for &[u8] inner buffer
+pub type BsIoSliceReader<'a> = BitstreamIoReader<io::Cursor<&'a [u8]>>;
+
 impl<R> BitstreamIoReader<R>
 where
     R: io::Read + io::Seek,
@@ -93,13 +99,27 @@ where
     }
 }
 
+impl BsIoVecReader {
+    pub fn from_vec(buf: Vec<u8>) -> Self {
+        let len = buf.len() as u64 * 8;
+        let read = io::Cursor::new(buf);
+
+        Self::new(read, len)
+    }
+}
+
+impl<'a> BsIoSliceReader<'a> {
+    pub fn from_slice(buf: &'a [u8]) -> Self {
+        let len = buf.len() as u64 * 8;
+        let read = io::Cursor::new(buf);
+
+        Self::new(read, len)
+    }
+}
+
 #[test]
 fn get_n_validations() {
-    let data = vec![1];
-    let len = data.len();
-    let read = io::Cursor::new(data);
-
-    let mut reader = BitstreamIoReader::new(read, len as u64);
+    let mut reader = BsIoSliceReader::from_slice(&[1]);
     assert!(reader.get_n::<u8>(9).is_err());
     assert!(reader.get_n::<u16>(4).is_ok());
 
@@ -110,11 +130,7 @@ fn get_n_validations() {
 
 #[test]
 fn skip_n_validations() {
-    let data = vec![1];
-    let len = data.len();
-    let read = io::Cursor::new(data);
-
-    let mut reader = BitstreamIoReader::new(read, len as u64);
+    let mut reader = BsIoSliceReader::from_slice(&[1]);
     assert!(reader.skip_n(9).is_err());
 
     assert!(reader.skip_n(7).is_ok());
