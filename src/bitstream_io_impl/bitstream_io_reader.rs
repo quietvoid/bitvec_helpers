@@ -101,7 +101,7 @@ where
 
 impl BsIoVecReader {
     pub fn from_vec(buf: Vec<u8>) -> Self {
-        let len = buf.len() as u64 * 8;
+        let len = buf.len() as u64;
         let read = io::Cursor::new(buf);
 
         Self::new(read, len)
@@ -110,7 +110,7 @@ impl BsIoVecReader {
 
 impl<'a> BsIoSliceReader<'a> {
     pub fn from_slice(buf: &'a [u8]) -> Self {
-        let len = buf.len() as u64 * 8;
+        let len = buf.len() as u64;
         let read = io::Cursor::new(buf);
 
         Self::new(read, len)
