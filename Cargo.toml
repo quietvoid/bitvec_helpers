@@ -1,6 +1,6 @@
 [package]
 name = "bitvec_helpers"
-version = "4.0.0"
+version = "3.1.0"
 authors = ["quietvoid"]
 edition = "2021"
 rust-version = "1.56.1"
@@ -15,7 +15,7 @@ funty = { version = "2.0.0", optional = true }
 bitstream-io = { version = "1.6.0", optional = true }
 
 [features]
-default = ["bitvec"]
+default = ["bitvec", "bitstream-io"]
 
 bitvec = ["dep:bitvec", "dep:funty", "dep:anyhow"]
 bitstream-io = ["dep:bitstream-io"]

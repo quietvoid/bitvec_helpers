@@ -19,16 +19,12 @@ impl BitstreamIoWriter {
 
     #[inline(always)]
     pub fn write_n<T: Numeric>(&mut self, v: &T, n: u32) -> io::Result<()> {
-        self.0.write(n, *v)?;
-
-        Ok(())
+        self.0.write(n, *v)
     }
 
     #[inline(always)]
     pub fn write_signed_n<T: SignedNumeric>(&mut self, v: &T, n: u32) -> io::Result<()> {
-        self.0.write_signed(n, *v)?;
-
-        Ok(())
+        self.0.write_signed(n, *v)
     }
 
     #[inline(always)]
