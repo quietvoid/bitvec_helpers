@@ -97,6 +97,11 @@ where
     pub fn position(&mut self) -> io::Result<u64> {
         self.bs.position_in_bits()
     }
+
+    pub fn replace_inner(&mut self, read: R, len_bytes: u64) {
+        self.len = len_bytes * 8;
+        self.bs = BitReader::new(read);
+    }
 }
 
 impl BsIoVecReader {
@@ -106,6 +111,11 @@ impl BsIoVecReader {
 
         Self::new(read, len)
     }
+
+    pub fn replace_vec(&mut self, buf: Vec<u8>) {
+        let len = buf.len() as u64;
+        self.replace_inner(io::Cursor::new(buf), len);
+    }
 }
 
 impl<'a> BsIoSliceReader<'a> {
@@ -114,6 +124,23 @@ impl<'a> BsIoSliceReader<'a> {
         let read = io::Cursor::new(buf);
 
         Self::new(read, len)
+    }
+
+    pub fn replace_slice(&mut self, buf: &'a [u8]) {
+        let len = buf.len() as u64;
+        self.replace_inner(io::Cursor::new(buf), len);
+    }
+}
+
+impl Default for BsIoVecReader {
+    fn default() -> Self {
+        Self::from_vec(Vec::new())
+    }
+}
+
+impl<'a> Default for BsIoSliceReader<'a> {
+    fn default() -> Self {
+        Self::from_slice(&[])
     }
 }
 

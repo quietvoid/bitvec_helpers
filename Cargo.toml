@@ -1,6 +1,6 @@
 [package]
 name = "bitvec_helpers"
-version = "3.1.1"
+version = "3.1.2"
 authors = ["quietvoid"]
 edition = "2021"
 rust-version = "1.56.1"
