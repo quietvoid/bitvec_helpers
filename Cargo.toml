@@ -9,7 +9,7 @@ description = "BitVec based bitstream reader and writer"
 repository = "https://github.com/quietvoid/bitvec_helpers"
 
 [dependencies]
-anyhow = { version = "1.0.68", optional = true }
+anyhow = { version = "1.0.71", optional = true }
 bitvec = { version = "1.0.1", optional = true }
 funty = { version = "2.0.0", optional = true }
 bitstream-io = { version = "1.6.0", optional = true }
