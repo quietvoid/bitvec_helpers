@@ -66,4 +66,8 @@ impl BitstreamIoWriter {
     pub fn as_slice(&mut self) -> Option<&[u8]> {
         self.0.writer().map(|e| e.as_slice())
     }
+
+    pub fn into_inner(self) -> Vec<u8> {
+        self.0.into_writer()
+    }
 }
