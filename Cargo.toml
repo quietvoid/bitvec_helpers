@@ -1,6 +1,6 @@
 [package]
 name = "bitvec_helpers"
-version = "3.1.5"
+version = "3.1.6"
 authors = ["quietvoid"]
 edition = "2021"
 rust-version = "1.79.0"
@@ -9,10 +9,10 @@ description = "BitVec based bitstream reader and writer"
 repository = "https://github.com/quietvoid/bitvec_helpers"
 
 [dependencies]
-anyhow = { version = "1.0.86", optional = true }
+anyhow = { version = "1.0.88", optional = true }
 bitvec = { version = "1.0.1", optional = true }
 funty = { version = "2.0.0", optional = true }
-bitstream-io = { version = "2.4.1", optional = true }
+bitstream-io = { version = "2.5.3", optional = true }
 
 [features]
 default = ["bitvec"]
