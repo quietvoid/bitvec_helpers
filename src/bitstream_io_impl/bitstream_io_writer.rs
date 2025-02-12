@@ -1,4 +1,4 @@
-use bitstream_io::{BigEndian, BitWrite, BitWriter, Numeric, SignedNumeric};
+use bitstream_io::{BigEndian, BitWrite, BitWriter, SignedNumeric, UnsignedNumeric};
 use std::io;
 
 use crate::signed_to_unsigned;
@@ -18,7 +18,7 @@ impl BitstreamIoWriter {
     }
 
     #[inline(always)]
-    pub fn write_n<T: Numeric>(&mut self, v: &T, n: u32) -> io::Result<()> {
+    pub fn write_n<T: UnsignedNumeric>(&mut self, v: &T, n: u32) -> io::Result<()> {
         self.0.write(n, *v)
     }
 

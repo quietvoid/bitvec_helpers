@@ -1,6 +1,6 @@
 use std::io;
 
-use bitstream_io::{BigEndian, BitRead, BitReader, Numeric};
+use bitstream_io::{BigEndian, BitRead, BitReader, UnsignedNumeric};
 
 pub struct BitstreamIoReader<R: io::Read + io::Seek> {
     bs: BitReader<R, BigEndian>,
@@ -30,7 +30,7 @@ where
     }
 
     #[inline(always)]
-    pub fn get_n<T: Numeric>(&mut self, n: u32) -> io::Result<T> {
+    pub fn get_n<T: UnsignedNumeric>(&mut self, n: u32) -> io::Result<T> {
         self.available().and_then(|avail| {
             if n as u64 > avail {
                 Err(io::Error::new(
@@ -138,7 +138,7 @@ impl Default for BsIoVecReader {
     }
 }
 
-impl<'a> Default for BsIoSliceReader<'a> {
+impl Default for BsIoSliceReader<'_> {
     fn default() -> Self {
         Self::from_slice(&[])
     }
