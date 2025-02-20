@@ -138,7 +138,7 @@ impl Default for BsIoVecReader {
     }
 }
 
-impl<'a> Default for BsIoSliceReader<'a> {
+impl Default for BsIoSliceReader<'_> {
     fn default() -> Self {
         Self::from_slice(&[])
     }

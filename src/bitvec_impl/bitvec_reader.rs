@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 
 use bitvec::{prelude::Msb0, slice::BitSlice, vec::BitVec};
 use funty::Integral;

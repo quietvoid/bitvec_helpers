@@ -1,4 +1,4 @@
-use anyhow::{anyhow, bail, ensure, Result};
+use anyhow::{Result, anyhow, bail, ensure};
 use bitvec::{field::BitField, prelude::Msb0, slice::BitSlice};
 use funty::Integral;
 
