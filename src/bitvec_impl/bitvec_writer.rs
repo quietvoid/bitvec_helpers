@@ -45,7 +45,7 @@ impl BitVecWriter {
         };
 
         if bits_diff > 0 {
-            self.bs.extend(std::iter::repeat(false).take(bits_diff));
+            self.bs.extend(std::iter::repeat_n(false, bits_diff));
             self.bs.extend_from_bitslice(slice);
         } else {
             self.bs.extend_from_bitslice(&slice[slice.len() - n..]);
@@ -69,9 +69,7 @@ impl BitVecWriter {
             }
 
             let leading_zeroes = leading_zeroes as usize;
-            let bits_iter = std::iter::repeat(false)
-                .take(leading_zeroes)
-                .chain(std::iter::once(true));
+            let bits_iter = std::iter::repeat_n(false, leading_zeroes).chain(std::iter::once(true));
 
             self.bs.extend(bits_iter);
             self.offset += leading_zeroes + 1;
@@ -83,7 +81,7 @@ impl BitVecWriter {
 
     #[inline(always)]
     pub fn write_se(&mut self, v: &i64) {
-        self.write_ue(&signed_to_unsigned(v));
+        self.write_ue(&signed_to_unsigned(*v));
     }
 
     #[inline(always)]
